@@ -1,10 +1,29 @@
-# Ogre Mesh Tools
+# Battlezone Mesh Tools
 
-Ogre Mesh Tools is a Windows GUI utility for fixing and converting Ogre `.mesh` / `.xml` files. It wraps the core Ogre tools with a Battlezone-inspired interface and a clean, single-button workflow.
+Battlezone Mesh Tools is a Windows GUI utility for fixing and converting Ogre `.mesh` / `.xml` files. It wraps the core Ogre tools with a Battlezone-inspired interface and a clean, single-button workflow.
+
+## Release Builds
+
+Download the latest Windows archive from the GitHub Releases page. The public executable name is intentionally stable and versionless:
+
+- Windows: `BZMeshTools.exe`
+
+Release archives carry the version and platform, for example `Battlezone98Redux_OgreMeshTools-v1.2.3-windows.zip`.
+
+Official Windows builds use the shared **Battlezone Modding Tools** product identity:
+
+```text
+FileDescription: Battlezone Mesh Tools
+ProductName: Battlezone Modding Tools
+CompanyName: GrizzlyOne95
+OriginalFilename: BZMeshTools.exe
+```
+
+`FileVersion` and `ProductVersion` are derived from the release tag. Non-release CI builds use neutral `0.0.0` metadata.
+
+The bundled Ogre helper executables (`OgreXMLConverter.exe`, `OgreMeshUpgrader.exe`, and `OgreMeshMagick.exe`) retain their upstream/runtime filenames because the conversion workflow invokes them directly.
 
 <img width="1202" height="882" alt="image" src="https://github.com/user-attachments/assets/cadf27b5-c11c-4783-b77b-cea2ec3b3307" />
-
-
 
 ## What It Can Do
 
@@ -17,7 +36,7 @@ Ogre Mesh Tools is a Windows GUI utility for fixing and converting Ogre `.mesh` 
 
 ## How To Use
 
-1. Launch `ogre_mesh_tools_gui.py` (or the Windows release executable).
+1. Launch `ogre_mesh_tools_gui.py` (or `BZMeshTools.exe` from the Windows release archive).
 2. Choose a single `.mesh` or `.xml` file, or enable `BATCH DIRECTORY MODE` and select a folder.
 3. Select the operations you want: `RECALCULATE NORMALS`, `CONVERT TO OBJ`, `CONVERT TO glTF`.
 4. `RECALCULATE NORMALS` uses XML conversion internally and writes the updated mesh back when the input is binary `.mesh`.

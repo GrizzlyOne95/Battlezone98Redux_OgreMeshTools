@@ -15,7 +15,7 @@ else:
     OGRE_PKG = os.path.abspath(os.path.dirname(_ogre_spec.origin))
 
 # --- DEFINITIVE OGRE MEDIA SEARCH ---
-# Ogre-python sometimes puts Media in site-packages/Ogre/Media, 
+# Ogre-python sometimes puts Media in site-packages/Ogre/Media,
 # or in the Python root (Python310/Media).
 MEDIA_SRC = None
 search_roots = [
@@ -83,7 +83,7 @@ datas = [
     # customtkinter assets (images, themes)
     (CTK_PKG, "customtkinter"),
     # Project data files
-    ("icon.ico",               "."),
+    ("branding/app_icon.png", "branding"),
     ("BZONE.ttf",              "."),
     ("BZBase.material",        "."),
     ("MeshToObj.py",           "."),
@@ -132,7 +132,7 @@ a = Analysis(
     ],
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=["rthook_ogre.py"],
+    runtime_hooks=["rthook_ogre.py", "branding/pyinstaller_icon_hook.py"],
     excludes=[
         # Ogre renderers we don't need on Windows
         "RenderSystem_Vulkan",
@@ -159,7 +159,6 @@ exe = EXE(
     runtime_tmpdir=None,
     console=False,     # windowed — no console popup
     disable_windowed_traceback=False,
-    icon="icon.ico",
+    icon="branding/app_icon.png",
 )
 # No COLLECT step — everything is inside the single EXE
-

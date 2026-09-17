@@ -1,10 +1,12 @@
 # OgreMeshTools.spec
-# PyInstaller spec file for BZOgreMeshTools
+# PyInstaller spec file for BZMeshTools
 # Build with: py -3.10 -m PyInstaller OgreMeshTools.spec --noconfirm
 
 import os
 import sys
 from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
+
+version_file = "branding/version_info.txt" if os.path.exists("branding/version_info.txt") else None
 
 # ── Locate the ogre-python package ────────────────────────────────────────────
 import importlib.util
@@ -67,7 +69,7 @@ binaries = []
 for dll in OGRE_DLLS:
     src = os.path.join(OGRE_PKG, dll)
     if os.path.isfile(src):
-        binaries.append((src, "Ogre"))          # land in dist/OgreMeshTools_Windows/Ogre/
+        binaries.append((src, "Ogre"))
 
 # Ogre .pyd extension modules land alongside the .py wrappers inside Ogre/
 for f in os.listdir(OGRE_PKG):
@@ -92,7 +94,7 @@ datas = [
     ("OgreImport.py",          "."),
     ("recalculate_normals.py", "."),
     ("ogre_preview.py",        "."),
-    # Helper executables
+    # Helper executables; names are preserved because the app invokes them directly.
     ("OgreXMLConverter.exe",   "."),
     ("OgreMeshUpgrader.exe",   "."),
     ("OgreMeshMagick.exe",     "."),
@@ -151,7 +153,7 @@ exe = EXE(
     a.scripts,
     a.binaries,        # <-- embedded directly for --onefile
     a.datas,           # <-- embedded directly for --onefile
-    name="OgreMeshTools_Windows",
+    name="BZMeshTools",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -161,5 +163,6 @@ exe = EXE(
     console=False,     # windowed — no console popup
     disable_windowed_traceback=False,
     icon="branding/app_icon.ico",
+    version=version_file,
 )
 # No COLLECT step — everything is inside the single EXE

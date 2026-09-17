@@ -35,15 +35,20 @@ jobs:
       run: |
         python scripts/generate_app_icon.py branding/repo_icon.svg branding/app_icon.ico --png branding/app_icon.png
 
+    - name: Generate Windows version metadata
+      run: |
+        python scripts/generate_version_info.py --version "${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.0.0' }}" --output branding/version_info.txt
+
     - name: Build with PyInstaller
       run: |
         python -m PyInstaller OgreMeshTools.spec --noconfirm
 
-    - name: Upload Artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: OgreMeshTools_Windows
-        path: dist/OgreMeshTools_Windows.exe
+        name: Battlezone98Redux_OgreMeshTools-windows
+        path: dist/BZMeshTools.exe
+        if-no-files-found: error
 
   release:
     name: Create Release
@@ -53,11 +58,23 @@ jobs:
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
+      with:
+        path: release-artifacts
+
+    - name: Package versioned Windows archive
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p release-packages/windows
+        cp release-artifacts/Battlezone98Redux_OgreMeshTools-windows/BZMeshTools.exe release-packages/windows/
+        (cd release-packages/windows && zip -q ../Battlezone98Redux_OgreMeshTools-${GITHUB_REF_NAME}-windows.zip BZMeshTools.exe)
+        ls -lh release-packages/
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          OgreMeshTools_Windows/OgreMeshTools_Windows.exe
+        files: release-packages/Battlezone98Redux_OgreMeshTools-v*-windows.zip
+        fail_on_unmatched_files: true
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

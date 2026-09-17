@@ -31,6 +31,10 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
+    - name: Generate canonical app icon
+      run: |
+        python scripts/generate_app_icon.py branding/repo_icon.svg branding/app_icon.ico --png branding/app_icon.png
+
     - name: Build with PyInstaller
       run: |
         python -m PyInstaller OgreMeshTools.spec --noconfirm

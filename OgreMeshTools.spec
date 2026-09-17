@@ -83,6 +83,7 @@ datas = [
     # customtkinter assets (images, themes)
     (CTK_PKG, "customtkinter"),
     # Project data files
+    ("branding/app_icon.ico", "branding"),
     ("branding/app_icon.png", "branding"),
     ("BZONE.ttf",              "."),
     ("BZBase.material",        "."),
@@ -159,6 +160,6 @@ exe = EXE(
     runtime_tmpdir=None,
     console=False,     # windowed — no console popup
     disable_windowed_traceback=False,
-    icon="branding/app_icon.png",
+    icon="branding/app_icon.ico",
 )
 # No COLLECT step — everything is inside the single EXE

@@ -24,6 +24,9 @@ def get_app_dir():
 APP_DIR = get_app_dir()
 CONFIG_FILE = os.path.join(APP_DIR, "ogre_tools_config.json")
 
+APP_USER_MODEL_ID = "GrizzlyOne95.Battlezone98Redux.OgreMeshTools"
+
+
 def get_resource_path(relative_path):
     """Get absolute path to resource for dev and PyInstaller bundling."""
     try:
@@ -31,6 +34,48 @@ def get_resource_path(relative_path):
     except Exception:
         base_path = APP_DIR
     return os.path.join(base_path, relative_path)
+
+
+def _set_app_user_model_id():
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_USER_MODEL_ID)
+    except Exception:
+        pass
+
+
+def apply_window_icon(window):
+    """Apply the canonical app icon to a Tk/Toplevel window.
+
+    Uses the bundled branding/app_icon.ico for the titlebar/taskbar
+    (iconbitmap) and branding/app_icon.png for iconphoto so taskbar,
+    Alt-Tab, and window decorations stay consistent.
+    """
+    try:
+        ico_path = get_resource_path(os.path.join("branding", "app_icon.ico"))
+        if os.path.exists(ico_path):
+            try:
+                window.iconbitmap(ico_path)
+            except Exception:
+                pass
+        png_path = get_resource_path(os.path.join("branding", "app_icon.png"))
+        if os.path.exists(png_path):
+            try:
+                import tkinter as tk
+
+                image = tk.PhotoImage(file=png_path)
+                window.iconphoto(True, image)
+                window._battlezone_app_icon = image
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+_set_app_user_model_id()
 
 # Ensure current dir is in sys.path for imports
 current_dir = get_resource_path(".")
@@ -93,12 +138,8 @@ class OgreMeshToolsGUI(ctk.CTk):
         self.title("OGRE MESH TOOLS")
         self.geometry("1200x850")
         
-        # --- ICON ---
-        self.icon_path = get_resource_path("icon.ico")
-        if os.path.exists(self.icon_path):
-            try:
-                self.iconbitmap(self.icon_path)
-            except: pass
+        # --- ICON (canonical branding/app_icon) ---
+        apply_window_icon(self)
         
         # --- THEME & COLORS ---
         self.colors = {

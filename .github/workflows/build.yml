@@ -35,9 +35,20 @@ jobs:
       run: |
         python scripts/generate_app_icon.py branding/repo_icon.svg branding/app_icon.ico --png branding/app_icon.png
 
+    - name: Resolve package version
+      id: version
+      shell: bash
+      run: |
+        if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+          version="${GITHUB_REF_NAME#v}"
+        else
+          version="$(tr -d '[:space:]' < VERSION)"
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
     - name: Generate Windows version metadata
       run: |
-        python scripts/generate_version_info.py --version "${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.0.0' }}" --output branding/version_info.txt
+        python scripts/generate_version_info.py --version "${{ steps.version.outputs.version }}" --output branding/version_info.txt
 
     - name: Build with PyInstaller
       run: |
@@ -53,9 +64,22 @@ jobs:
   release:
     name: Create Release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: "${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release): v')) }}"
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
+
+    - name: Resolve release tag
+      id: release_version
+      shell: bash
+      run: |
+        if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+          tag="$GITHUB_REF_NAME"
+        else
+          tag="v$(tr -d '[:space:]' < VERSION)"
+        fi
+        echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
@@ -63,16 +87,21 @@ jobs:
 
     - name: Package versioned Windows archive
       shell: bash
+      env:
+        RELEASE_TAG: ${{ steps.release_version.outputs.tag }}
       run: |
         set -euo pipefail
         mkdir -p release-packages/windows
         cp release-artifacts/Battlezone98Redux_OgreMeshTools-windows/BZMeshTools.exe release-packages/windows/
-        (cd release-packages/windows && zip -q ../Battlezone98Redux_OgreMeshTools-${GITHUB_REF_NAME}-windows.zip BZMeshTools.exe)
+        (cd release-packages/windows && zip -q ../Battlezone98Redux_OgreMeshTools-${RELEASE_TAG}-windows.zip BZMeshTools.exe)
         ls -lh release-packages/
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ steps.release_version.outputs.tag }}
+        name: ${{ steps.release_version.outputs.tag }}
+        target_commitish: ${{ github.sha }}
         files: release-packages/Battlezone98Redux_OgreMeshTools-v*-windows.zip
         fail_on_unmatched_files: true
         generate_release_notes: true
